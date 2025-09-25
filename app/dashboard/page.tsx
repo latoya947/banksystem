@@ -34,22 +34,44 @@ export default async function DashboardPage() {
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
   // Get user accounts
-  const { data: accounts } = await supabase
+  const { data: accounts, error: accountsError } = await supabase
     .from("accounts")
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })
 
   // Get recent transactions
-  const { data: transactions } = await supabase
-    .from("transactions")
-    .select(`
-      *,
-      accounts!inner(account_number, account_type)
-    `)
-    .eq("accounts.user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(10)
+  const accountIds = (accounts || []).map((a: any) => a.id)
+  const { data: transactions, error: transactionsError } = accountIds.length
+    ? await supabase
+        .from("transactions")
+        .select(
+          `id, amount, transaction_type, description, created_at, account_id,
+           accounts(account_number, account_type, user_id)`
+        )
+        .in("account_id", accountIds)
+        .order("created_at", { ascending: false })
+        .limit(50)
+    : { data: [] as any[] }
+
+  // Get recent pending transactions (user visibility)
+  const { data: pendingTransactions, error: pendingError } = accountIds.length
+    ? await supabase
+        .from("pending_transactions")
+        .select(
+          `id, amount, status, description, created_at, account_id,
+           accounts(account_number, account_type, user_id)`
+        )
+        .in("account_id", accountIds)
+        .in("status", ["pending", "requires_otp"]) 
+        .order("created_at", { ascending: false })
+        .limit(20)
+    : { data: [] as any[] }
+
+  const recentCombined = [
+    ...(transactions || []).map((t: any) => ({ ...t, _status: "completed" })),
+    ...(pendingTransactions || []).map((p: any) => ({ ...p, _status: p.status })),
+  ].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -116,8 +138,8 @@ export default async function DashboardPage() {
         className="bg-gradient-to-br from-green-800 via-green-700 to-green-800 text-white shadow-md border border-green-800 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg animate-fadeIn"
       >
         <CardHeader>
-          <CardTitle className="text-lg capitalize text-green-100">
-            {account.account_type} Account
+          <CardTitle className="text-lg text-green-100">
+            Account
           </CardTitle>
           <CardDescription className="text-green-200">
             Account #{account.account_number}
@@ -191,9 +213,9 @@ export default async function DashboardPage() {
     <CardDescription className="text-gray-600">Your latest account activity</CardDescription>
   </CardHeader>
   <CardContent>
-    {transactions && transactions.length > 0 ? (
+              {recentCombined && recentCombined.length > 0 ? (
       <div className="space-y-4">
-        {transactions.map((transaction) => (
+                {recentCombined.map((transaction) => (
           <div
             key={transaction.id}
             className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0 group transition-colors duration-200 hover:bg-white/60 rounded-md px-2"
@@ -203,16 +225,20 @@ export default async function DashboardPage() {
                 {/* Status Dot */}
                 <div
                   className={`w-3 h-3 rounded-full transition-all ${
-                    transaction.amount > 0 ? "bg-green-500 group-hover:bg-green-600" : "bg-red-500 group-hover:bg-red-600"
+                    transaction._status === "completed"
+                      ? transaction.amount > 0
+                        ? "bg-green-500 group-hover:bg-green-600"
+                        : "bg-red-500 group-hover:bg-red-600"
+                      : "bg-yellow-500 group-hover:bg-yellow-600"
                   }`}
                 />
                 {/* Transaction Info */}
                 <div>
                   <p className="font-semibold capitalize text-gray-800">
-                    {transaction.transaction_type.replace("_", " ")}
+                    {transaction._status === "completed" ? transaction.transaction_type.replace("_", " ") : transaction.status.replace("_", " ")}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {transaction.accounts.account_type} • {transaction.accounts.account_number}
+                    Account • {transaction.accounts.account_number}
                   </p>
                   {transaction.description && (
                     <p className="text-sm text-gray-600">{transaction.description}</p>
@@ -222,28 +248,40 @@ export default async function DashboardPage() {
             </div>
             {/* Amount + Date */}
             <div className="text-right">
-              <p
-                className={`font-semibold text-lg ${
-                  transaction.amount > 0
-                    ? "text-green-600 group-hover:text-green-700"
-                    : "text-red-600 group-hover:text-red-700"
-                }`}
-              >
-                {transaction.amount > 0 ? "+" : "-"}$
-                {Math.abs(Number.parseFloat(transaction.amount)).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                })}
-              </p>
+                      {typeof transaction.amount !== "undefined" && transaction._status === "completed" ? (
+                        <p
+                          className={`font-semibold text-lg ${
+                            transaction.amount > 0
+                              ? "text-green-600 group-hover:text-green-700"
+                              : "text-red-600 group-hover:text-red-700"
+                          }`}
+                        >
+                          {transaction.amount > 0 ? "+" : "-"}$
+                          {Math.abs(Number.parseFloat(transaction.amount)).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </p>
+                      ) : (
+                        <p className="text-sm font-medium text-yellow-700">Pending</p>
+                      )}
               <p className="text-sm text-gray-500">
                 {new Date(transaction.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>
-        ))}
+                ))}
       </div>
-    ) : (
-      <p className="text-gray-500 text-center py-8">No transactions yet</p>
-    )}
+              ) : (
+                <div className="text-center py-8 space-y-2">
+                  <p className="text-gray-500">No transactions yet</p>
+                  <p className="text-xs text-gray-400">
+                    Debug: accounts={accountIds.length} tx={(transactions||[]).length} pending={(pendingTransactions||[]).length}
+                    {accountsError ? ` | accountsError=${accountsError.message}` : ''}
+                    {transactionsError ? ` | txError=${transactionsError.message}` : ''}
+                    {pendingError ? ` | pendingError=${pendingError.message}` : ''}
+                  </p>
+                </div>
+              )}
   </CardContent>
 </Card>
 

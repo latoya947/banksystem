@@ -25,3 +25,4 @@ FROM auth.users u
 JOIN public.profiles p ON u.id = p.id
 WHERE p.is_admin = true;
 
+

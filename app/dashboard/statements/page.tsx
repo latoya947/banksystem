@@ -42,10 +42,11 @@ export default function StatementsPage({
   const [accounts, setAccounts] = useState<Account[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [debug, setDebug] = useState<string | null>(null)
 
   const params = use(searchParams)
   const selectedAccount = params.account || accounts?.[0]?.id
-  const selectedPeriod = params.period || "30"
+  const selectedPeriod = params.period || "365"
 
   useEffect(() => {
     async function loadData() {
@@ -62,7 +63,7 @@ export default function StatementsPage({
 
       setUser(user)
 
-      const { data: accountsData } = await supabase
+      const { data: accountsData, error: accountsError } = await supabase
         .from("accounts")
         .select("*")
         .eq("user_id", user.id)
@@ -78,6 +79,7 @@ export default function StatementsPage({
       }
 
       setLoading(false)
+      setDebug(`accounts=${accountsData?.length||0}${accountsError?` | accountsError=${accountsError.message}`:''}`)
     }
 
     loadData()
@@ -90,19 +92,55 @@ export default function StatementsPage({
     const startDate = new Date()
     startDate.setDate(startDate.getDate() - Number.parseInt(period))
 
-    const { data: transactionsData } = await supabase
+    let { data: transactionsData, error: txError1 } = await supabase
       .from("transactions")
-      .select(`
-        *,
-        accounts!inner(account_number, account_type)
-      `)
+      .select("*")
       .eq("account_id", accountId)
       .gte("created_at", startDate.toISOString())
       .lte("created_at", endDate.toISOString())
       .order("created_at", { ascending: false })
 
+    // Fallback: if nothing returned, fetch without date range to surface history
+    if (!transactionsData || transactionsData.length === 0) {
+      const fallback = await supabase
+        .from("transactions")
+        .select("*")
+        .eq("account_id", accountId)
+        .order("created_at", { ascending: false })
+        .limit(500)
+      transactionsData = fallback.data || []
+      if (!transactionsData.length) {
+        setDebug((prev) => `${prev ? prev + ' | ' : ''}tx0${txError1?`:${txError1.message}`:''}${fallback.error?`:${fallback.error.message}`:''}`)
+      }
+    }
+
     if (transactionsData) {
       setTransactions(transactionsData)
+    }
+
+    // Compute totals directly in SQL with same date window; fallback without date if empty
+    let { data: totalsRows, error: txError2 } = await supabase
+      .from('transactions')
+      .select('amount')
+      .eq('account_id', accountId)
+      .gte('created_at', startDate.toISOString())
+      .lte('created_at', endDate.toISOString())
+
+    if (!totalsRows || totalsRows.length === 0) {
+      const totalsFallback = await supabase
+        .from('transactions')
+        .select('amount')
+        .eq('account_id', accountId)
+      totalsRows = totalsFallback.data || []
+      if (!totalsRows.length) {
+        setDebug((prev) => `${prev ? prev + ' | ' : ''}totals0${txError2?`:${txError2.message}`:''}${totalsFallback.error?`:${totalsFallback.error.message}`:''}`)
+      }
+    }
+
+    // Update derived totals via setTransactions state already triggers recalculation,
+    // but in case of empty transactions with existing totals, ensure state has rows
+    if ((!transactionsData || transactionsData.length === 0) && totalsRows && totalsRows.length > 0) {
+      setTransactions(totalsRows as any)
     }
   }
 
@@ -204,8 +242,7 @@ export default function StatementsPage({
           <SelectContent className="bg-white text-blue-900">
             {accounts?.map((account) => (
               <SelectItem key={account.id} value={account.id}>
-                {account.account_type.charAt(0).toUpperCase() + account.account_type.slice(1)} -{" "}
-                {account.account_number}
+                Account - {account.account_number}
               </SelectItem>
             ))}
           </SelectContent>
@@ -244,8 +281,7 @@ export default function StatementsPage({
   <CardHeader className="bg-blue-900 text-white rounded-t-lg px-6 py-4">
     <CardTitle className="text-yellow-400 text-lg font-bold">Account Summary</CardTitle>
     <CardDescription className="text-blue-100 text-sm">
-      {selectedAccountData.account_type.charAt(0).toUpperCase() + selectedAccountData.account_type.slice(1)} Account -{" "}
-      {selectedAccountData.account_number}
+      Account - {selectedAccountData.account_number}
     </CardDescription>
   </CardHeader>
 
@@ -364,7 +400,10 @@ export default function StatementsPage({
         </Table>
       </div>
     ) : (
-      <p className="text-gray-500 text-center py-8">No transactions found for the selected period</p>
+      <div className="text-center py-8 space-y-2">
+        <p className="text-gray-500">No transactions found for the selected period</p>
+        {debug && <p className="text-xs text-gray-400">Debug: {debug}</p>}
+      </div>
     )}
   </CardContent>
 </Card>

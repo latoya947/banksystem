@@ -25,7 +25,14 @@ export default async function AdminPage() {
   const { data: profiles } = await supabase
     .from("profiles")
     .select(`
-      *,
+      id,
+      email,
+      full_name,
+      phone,
+      address,
+      role,
+      is_admin,
+      created_at,
       accounts(*)
     `)
     .order("created_at", { ascending: false })
@@ -44,14 +51,15 @@ export default async function AdminPage() {
   const allUsers =
     profiles?.map((profile) => ({
       id: profile.id,
-      email: "User", // We'll fix this later with a proper query
+      email: profile.email ?? "User",
       created_at: profile.created_at,
       profile: profile,
       accounts: profile.accounts || [],
+      is_admin: profile.is_admin === true || profile.role === 'admin',
     })) || []
 
   // Calculate regular users count (non-admin users)
-  const regularUsersCount = profiles?.filter(profile => profile.role !== 'admin').length || 0
+  const regularUsersCount = profiles?.filter((p: any) => (p.is_admin !== true && p.role !== 'admin')).length || 0
 
   console.log("[v0] All users mapped:", allUsers.length)
   console.log("[v0] Regular users count:", regularUsersCount)

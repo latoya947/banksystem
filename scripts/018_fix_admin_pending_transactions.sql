@@ -62,3 +62,4 @@ END $$;
 GRANT SELECT, UPDATE ON public.pending_transactions TO authenticated;
 GRANT EXECUTE ON FUNCTION public.update_account_balance TO authenticated;
 
+

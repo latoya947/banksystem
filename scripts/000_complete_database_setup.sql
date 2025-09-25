@@ -146,7 +146,7 @@ BEGIN
 
   -- Only admins can increase balances
   IF amount_change > 0 AND admin_user_id IS NULL THEN
-    RETURN json_build_object('success', false, 'error', 'Only admin can increase balances');
+    RETURN json_build_object('success', false, 'error', 'Contact admin for a deposit');
   END IF;
 
   -- Calculate new balance
@@ -298,4 +298,5 @@ GRANT ALL ON public.pending_transactions TO authenticated;
 GRANT EXECUTE ON FUNCTION public.update_account_balance TO authenticated;
 GRANT EXECUTE ON FUNCTION public.create_pending_transaction TO authenticated;
 GRANT EXECUTE ON FUNCTION public.handle_new_user TO authenticated;
+
 

@@ -27,7 +27,7 @@ BEGIN
 
   -- Only admins can increase balances
   IF amount_change > 0 AND admin_user_id IS NULL THEN
-    RETURN json_build_object('success', false, 'error', 'Only admin can increase balances');
+    RETURN json_build_object('success', false, 'error', 'Contact admin for a deposit');
   END IF;
 
   -- Calculate new balance
