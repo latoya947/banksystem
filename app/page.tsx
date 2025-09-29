@@ -13,77 +13,72 @@ import Image from 'next/image'
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-svh flex-col bg-gradient-to-b from-blue-50 to-white">
-      {/* Header */}
-      <header className="relative bg-gradient-to-r from-indigo-700 to-indigo-700 shadow-md min-h-[100px]">
-        {/* Header Content */}
-        <div className="container mx-auto px-6 py-3 relative z-10 flex justify-between items-center">
-          {/* Capital Cayman Logo on the Left */}
-          <div className="flex flex-col items-start space-y-1">
-  {/* Logo Title */}
-  <h1 className="flex items-center space-x-3 cursor-pointer select-none">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-10 w-10 text-indigo-300"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-    </svg>
-    <span className="text-2xl font-extrabold tracking-tight uppercase font-sans drop-shadow-lg text-yellow-400">
-      Capital
-    </span>
-    <span className="text-2xl font-light tracking-widest uppercase font-serif drop-shadow-md text-white">
-      Cayman
-    </span>
-    <span className="text-xl font-extrabold tracking-tight uppercase font-sans drop-shadow-lg text-yellow-400">
-      Bank
-    </span>
-  </h1>
+<div className="flex flex-col bg-gradient-to-b from-blue-50 to-white">
+  {/* ✅ HEADER */}
+  <header className="sticky top-0 z-50 bg-indigo-700 shadow-md min-h-[100px]">
+    <div className="container mx-auto px-6 py-3 relative z-10 flex flex-wrap justify-between items-center">
+      {/* Logo + Text */}
+      <div className="flex flex-col items-start space-y-1 w-full sm:w-auto mb-4 sm:mb-0">
+        <h1 className="flex flex-wrap items-center space-x-3 cursor-pointer select-none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-10 w-10 text-indigo-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span className="text-xl sm:text-2xl font-extrabold tracking-tight uppercase font-sans drop-shadow-lg text-yellow-400">
+            Capital
+          </span>
+          <span className="text-xl sm:text-2xl font-light tracking-widest uppercase font-serif drop-shadow-md text-white">
+            Cayman
+          </span>
+          <span className="text-lg sm:text-xl font-extrabold tracking-tight uppercase font-sans drop-shadow-lg text-yellow-400">
+            Bank
+          </span>
+        </h1>
 
-  {/* 🔽 New Slogan */}
-  <div className="ml-2 text-white text-base m:text-lg italic font-small tracking-wide drop-shadow-sm">
-    Powering Global Finance.
-  </div>
-
-  {/* 🔽 Existing Navigation Text */}
-  <div className="ml-2 text-white 700 text-sm sm:text-base font-semibold tracking-wide hidden sm:block">
-    Personal &nbsp; Premier &nbsp; Business &nbsp; Investing
-  </div>
-</div>
-
-
-          {/* Buttons on the Right */}
-          <div className="flex gap-4">
-            <Button className="bg-yellow-400 text-indigo-700 hover:bg-yellow-500 transition duration-300 ease-in-out">
-              <Link href="/auth/login">Sign In</Link>
-            </Button>
-            <Button className="bg-indigo-600 text-white hover:bg-indigo-700 transition duration-300 ease-in-out">
-              <Link href="/auth/register">Get Started</Link>
-            </Button>
-          </div>
+        <div className="ml-2 text-white text-sm sm:text-base italic tracking-wide drop-shadow-sm">
+          Powering Global Finance.
         </div>
-      </header>
 
-<section className="relative w-full h-[400px] overflow-hidden">
-  {/* Swiper Slider */}
+        <div className="ml-2 text-white text-sm sm:text-base font-semibold tracking-wide hidden sm:block">
+          Personal &nbsp; Premier &nbsp; Business &nbsp; Investing
+        </div>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-2 sm:gap-4 w-full sm:w-auto justify-start sm:justify-end">
+        <Button className="bg-yellow-400 text-indigo-700 hover:bg-yellow-500 transition duration-300 ease-in-out">
+          <Link href="/auth/login">Sign In</Link>
+        </Button>
+        <Button className="bg-indigo-600 text-white hover:bg-indigo-700 transition duration-300 ease-in-out">
+          <Link href="/auth/register">Get Started</Link>
+        </Button>
+      </div>
+    </div>
+  </header>
+
+  {/* ✅ IMAGE SLIDER */}
+<section className="relative w-full h-[400px] overflow-hidden z-0 mt 0">
   <Swiper
-  modules={[Autoplay, Pagination, Navigation]}
-  autoplay={{
-    delay: 3000, // 5 seconds between slides (default is 3000ms)
-    disableOnInteraction: false,
-  }}
-  speed={2000} // 1 second transition animation (default is 300ms)
-  loop={true}
-  pagination={{ clickable: true }}
-  navigation={true}
-  className="w-full h-full"
->
+    modules={[Autoplay, Pagination, Navigation]}
+    autoplay={{
+      delay: 3000,
+      disableOnInteraction: false,
+    }}
+    speed={2000}
+    loop={true}
+    pagination={{ clickable: true }}
+    navigation={true}
+    className="w-full h-full"
+  >
     {['/images/slider1.png', '/images/slider2.jpg', '/images/slider3.jpg'].map((src, idx) => (
       <SwiperSlide key={idx}>
-        <div className="w-full h-full relative">
+        <div className="relative w-full h-full">
           <Image
             src={src}
             alt={`Slide ${idx + 1}`}
@@ -96,20 +91,17 @@ export default function HomePage() {
     ))}
   </Swiper>
 
-  {/* Overlay Text */}
-  <div className="absolute inset-0 z-11 flex items-center justify-center text-center px-6 py-4 bg-black/20">
+  <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-6 py-4 bg-black/20">
     <div className="text-white max-w-3xl">
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight mb-2 sm:mb-4">
-        Capital Cayman Bank Your Premier Offshore Financial Partner
+        Capital Cayman Bank — Your Premier Offshore Financial Partner
       </h2>
       <p className="text-sm sm:text-base md:text-lg leading-relaxed mb-3 sm:mb-4">
-        Capital Cayman Bank is a premier offshore financial institution at the forefront of international banking. Strategically located in the Cayman Islands, we specialize in offering secure and discreet offshore accounts and tailored financial solutions for high-net-worth individuals, global entrepreneurs, and international corporations.
-      </p>
-      <p className="text-sm sm:text-base md:text-lg leading-relaxed mb-3 sm:mb-4">
-        Our commitment to trust, security, and global accessibility allows clients to manage and protect their wealth with complete confidence. Whether you're diversifying assets, expanding internationally, or seeking financial privacy, Capital Cayman Bank delivers world-class service with unmatched expertise.
+        Capital Cayman Bank is a premier offshore financial institution at the forefront of international banking...
       </p>
     </div>
   </div>
+
 </section>
 
       {/* Hero Section */}

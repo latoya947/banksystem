@@ -70,19 +70,24 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-blue-900">SecureBank</h1>
-            <Badge variant="destructive">Admin Panel</Badge>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
-              <Link href="/admin">Back to Admin</Link>
-            </Button>
-          </div>
-        </div>
+  {/* ✅ Sticky Header */}
+  <header className="sticky top-0 z-50 bg-indigo-700 border-b shadow-sm">
+    <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      
+      {/* Left: Title + Badge */}
+      <div className="flex items-center gap-4">
+        <h1 className="text-2xl font-bold text-white">Capital Cayman Bank</h1>
+        <Badge variant="destructive">Admin Panel</Badge>
+      </div>
+
+      {/* Right: Back Button */}
+      <div className="flex items-center gap-4">
+        <Button variant="outline" asChild>
+          <Link href="/admin">Back to Admin</Link>
+        </Button>
+      </div>
+
+    </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">

@@ -1,3 +1,4 @@
+
 "use client"
 
 import type React from "react"
@@ -39,15 +40,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen [bg-blue-900]">
+    <div className="relative min-h-screen bg-gray-800">
+
       {/* Header with Logo */}
       <header className="absolute top-0 left-0 w-full bg-transparent p-4 z-10">
         <div className="flex items-center">
           {/* Capital Cayman Logo */}
-          <h1 className="flex items-center space-x-3 cursor-pointer select-none">
+          <h1 className="flex flex-wrap items-center gap-x-2 cursor-pointer select-none">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-indigo-300"
+              className="h-8 w-8 sm:h-10 sm:w-10 text-indigo-300"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -55,28 +57,32 @@ export default function LoginPage() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            <span className="text-4xl font-extrabold tracking-tight uppercase font-sans text-yellow-400">
+            <span className="text-2xl sm:text-4xl font-extrabold tracking-tight uppercase font-sans text-yellow-400">
               Capital
             </span>
-            <span className="text-4xl font-light tracking-widest uppercase font-serif text-indigo-900">
+            <span className="text-2xl sm:text-4xl font-light tracking-widest uppercase font-serif text-indigo-900">
               Cayman
             </span>
-            <span className="text-3xl font-extrabold tracking-tight uppercase font-sans drop-shadow-lg text-yellow-400">
-                  Bank
-                </span>
+            <span className="text-xl sm:text-3xl font-extrabold tracking-tight uppercase font-sans drop-shadow-lg text-yellow-400">
+              Bank
+            </span>
           </h1>
         </div>
       </header>
 
-      {/* Content */}
-      <div className="flex min-h-screen w-full items-center justify-center bg-cover bg-center p-6 md:p-10" style={{ backgroundImage: "url('/images/slider1.png')" }}>
-        <div className="w-full max-w-sm px-4 animate-fade-slide">
+
+{/* Content */}
+      <div
+        className="flex min-h-screen w-full items-center justify-center bg-cover bg-center bg-no-repeat p-4 sm:p-6 md:p-10"
+        style={{ backgroundImage: "url('/images/slider1.png')" }}
+      >
+        <div className="w-full max-w-sm px-4 sm:px-6 md:px-10 animate-fade-slide">
           <Card className="rounded-2xl shadow-2xl bg-gray-400">
             <CardHeader className="text-center mb-2">
-              <div className="flex items-center justify-center gap-2 cursor-pointer select-none mb-2">
+              <div className="flex flex-wrap items-center justify-center gap-2 cursor-pointer select-none mb-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-7 w-7 text-indigo-300"
+                  className="h-6 w-6 sm:h-7 sm:w-7 text-indigo-300"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -84,14 +90,14 @@ export default function LoginPage() {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                <span className="text-3xl font-extrabold tracking-tight uppercase font-sans drop-shadow-lg text-yellow-400">
+                <span className="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase font-sans drop-shadow-lg text-yellow-400">
                   Capital
                 </span>
-                <span className="text-3xl font-light tracking-widest uppercase font-serif drop-shadow-md text-indigo-900">
+                <span className="text-2xl sm:text-3xl font-light tracking-widest uppercase font-serif drop-shadow-md text-indigo-900">
                   Cayman
                 </span>
               </div>
-              <CardDescription className="text-[15px] text-indigo-800 font-medium leading-snug tracking-tight">
+              <CardDescription className="text-sm sm:text-[15px] text-indigo-800 font-medium leading-snug tracking-tight">
                 Sign in to your Capital Cayman Bank account
               </CardDescription>
             </CardHeader>
@@ -151,10 +157,11 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-6 ">
-        <div className="container mx-auto text-center">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-400">
+
+{/* Footer */}
+      <footer className="bg-gray-800 text-white py-6 mt-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-gray-400">
             <div>
               <h3 className="font-semibold text-white">Company</h3>
               <ul>
@@ -189,11 +196,13 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 space-y-2">
             <p className="text-sm text-gray-400">
               &copy; 2024 Capital Cayman. All rights reserved.
             </p>
-            <p className="text-sm text-gray-400">Capital Cayman Bank Ltd. and Capital Cayman Securities Ltd. are licensed and regulated by the Cayman Islands Monetary Authority.</p>
+            <p className="text-sm text-gray-400">
+              Capital Cayman Bank Ltd. and Capital Cayman Securities Ltd. are licensed and regulated by the Cayman Islands Monetary Authority.
+            </p>
           </div>
         </div>
       </footer>
